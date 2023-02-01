@@ -1,0 +1,24 @@
+{
+  "name": "solid-happiness",
+  "version": "1.0.0",
+  "description": "",
+  "main": "twitter.js",
+  "dependencies": {
+    "twitter-api-client": "^1.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "twitter": "node ./twitter.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smac7/solid-happiness"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smac7/solid-happiness/issues"
+  },
+  "homepage": "https://github.com/smac7/solid-happiness#readme"
+}
