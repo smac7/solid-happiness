@@ -4,7 +4,7 @@
   "description": "",
   "main": "twitter.js",
   "dependencies": {
-    "twitter-api-client": "^1.6.1"
+    "twitter-api-v2": "^1.14.1"
   },
   "devDependencies": {},
   "scripts": {
