@@ -45,6 +45,18 @@ const _getFreshFrankWarrenFighters = async () => {
   }
 };
 
+const _getFreshProbellumFighters = async () => {
+  try {
+    const dom = await JSDOM.fromURL("https://probellum.com/athletes/");
+    const root = HtmlParser.parse(dom.serialize());
+    return root.querySelectorAll('.name .col').map(element => {
+        return element.textContent.trim().replace(/\s\s+/g, ' ');
+    }).sort();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const _getStoredFightersFor = async (promoter) => {
   const Fighters = Parse.Object.extend('Fighters');
   const query = new Parse.Query(Fighters);
@@ -122,9 +134,14 @@ const _getFighterTweets = async (
     const freshFrankWarrenFighters = await _getFreshFrankWarrenFighters();
     const frankWarrenTweets = await _getFighterTweets(freshFrankWarrenFighters, 'frank-warren', 'Frank Warren and Queensberry Promotions');
 
+    // Probellum
+    const freshProbellumFighters = await _getFreshProbellumFighters();
+    const probellumTweets = await _getFighterTweets(freshProbellumFighters, 'probellum', 'Probellum');
+    
     await _tweetIncrementally([
       ...matchroomTweets,
       ...frankWarrenTweets,
+      ...probellumTweets,
     ]);
   } catch (error) {
     console.error(error);
