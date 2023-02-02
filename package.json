@@ -4,12 +4,16 @@
   "description": "",
   "main": "twitter.js",
   "dependencies": {
-    "twitter-api-v2": "^1.14.1"
+    "twitter-api-v2": "^1.14.1",
+    "parse": "^4.0.1",
+    "jsdom": "^21.1.0",
+    "node-html-parser": "^6.1.4"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "twitter": "node ./twitter.js"
+    "roster": "node ./roster.js",
+    "roster-upload": "node ./roster-upload-playground.js"
   },
   "repository": {
     "type": "git",
