@@ -75,6 +75,25 @@ const _getFreshPbcFighters = async () => {
   }
 };
 
+const _getFreshBoxxerFighters = async () => {
+  try {
+    const domOne = await JSDOM.fromURL("https://www.boxxer.com/roster/?vp_page=1");
+    const domTwo = await JSDOM.fromURL("https://www.boxxer.com/roster/?vp_page=2");
+
+    const rootOne = HtmlParser.parse(domOne.serialize());
+    const rootTwo = HtmlParser.parse(domTwo.serialize());
+    const allSelections = [
+      ...rootOne.querySelectorAll('.vp-portfolio__item-img-overlay'),
+      ...rootTwo.querySelectorAll('.vp-portfolio__item-img-overlay'),
+    ];
+    return allSelections.map(element => {
+      return element.querySelectorAll('h2')[0].textContent.trim();
+  }).sort();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const _getStoredFightersFor = async (promoter) => {
   const Fighters = Parse.Object.extend('Fighters');
   const query = new Parse.Query(Fighters);
@@ -159,12 +178,17 @@ const _getFighterTweets = async (
     // PBC
     const freshPbcFighters = await _getFreshPbcFighters();
     const pbcTweets = await _getFighterTweets(freshPbcFighters, 'pbc', 'Premier Boxing Champions');
+
+    // Boxxer
+    const freshBoxxerFighters = await _getFreshBoxxerFighters();
+    const boxxerTweets = await _getFighterTweets(freshBoxxerFighters, 'boxxer', 'BOXXER');
     
     await _tweetIncrementally([
       ...matchroomTweets,
       ...frankWarrenTweets,
       ...probellumTweets,
       ...pbcTweets,
+      ...boxxerTweets,
     ]);
   } catch (error) {
     console.error(error);
