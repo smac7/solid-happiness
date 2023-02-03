@@ -57,6 +57,24 @@ const _getFreshProbellumFighters = async () => {
   }
 };
 
+const _getFreshPbcFighters = async () => {
+  try {
+    const dom = await JSDOM.fromURL("https://www.premierboxingchampions.com/fighters");
+    const root = HtmlParser.parse(dom.serialize());
+    return new Set(root.querySelectorAll('.name').map(element => {
+        return element.childNodes
+            .filter(node => {
+                const textValue = node.textContent.trim().replace(/\s\s+/g, ' ').trim();
+                return textValue !== '' && (!textValue.startsWith('\"') && !textValue.endsWith('\"'))
+            })
+            .map(node => node.textContent.trim().replace(/\s\s+/g, ' ').trim())
+            .join(' ');            
+    }).filter(textContent => textContent.includes(' ')));
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const _getStoredFightersFor = async (promoter) => {
   const Fighters = Parse.Object.extend('Fighters');
   const query = new Parse.Query(Fighters);
@@ -138,10 +156,15 @@ const _getFighterTweets = async (
     const freshProbellumFighters = await _getFreshProbellumFighters();
     const probellumTweets = await _getFighterTweets(freshProbellumFighters, 'probellum', 'Probellum');
     
+    // PBC
+    const freshPbcFighters = await _getFreshPbcFighters();
+    const pbcTweets = await _getFighterTweets(freshPbcFighters, 'pbc', 'Premier Boxing Champions');
+    
     await _tweetIncrementally([
       ...matchroomTweets,
       ...frankWarrenTweets,
       ...probellumTweets,
+      ...pbcTweets,
     ]);
   } catch (error) {
     console.error(error);
