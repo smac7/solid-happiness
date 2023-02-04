@@ -2,6 +2,7 @@ const { TwitterApi } = require('twitter-api-v2');
 const Parse = require('parse/node');
 const { JSDOM } = require('jsdom');
 const HtmlParser = require('node-html-parser');
+const fetch = require('node-fetch');
 
 const _tweetIncrementally = async (tweets) => {
     const twitterClient = new TwitterApi({
@@ -89,6 +90,37 @@ const _getFreshBoxxerFighters = async () => {
     return allSelections.map(element => {
       return element.querySelectorAll('h2')[0].textContent.trim();
   }).sort();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const _getFreshTopRankFighters = async () => {
+  try {
+    let fighterPage = 1;
+    let fighters = [];
+    while (true) {
+      const params = new URLSearchParams();
+      params.append('action', 'all_fighters_json');
+      params.append('start', fighterPage);
+  
+      const response = await fetch('https://www.toprank.com/wp-admin/admin-ajax.php', {
+        method: 'POST', 
+        body: params, 
+        headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'Accept': '*/*'}}
+      );
+      const pagedResponse = await response.json();
+      const pagedFighters = pagedResponse.fighters;
+      const isLastPage = !pagedFighters?.length > 0;
+      if (isLastPage) {
+        break;
+      }
+      const pagedFightersNames = pagedFighters.map(pagedFighter => pagedFighter.name);
+  
+      fighters = [...fighters, ...pagedFightersNames]
+      fighterPage = fighterPage + 1;
+    }
+    return fighters;
   } catch (error) {
     console.error(error);
   }
@@ -183,12 +215,17 @@ const _getFighterTweets = async (
     const freshBoxxerFighters = await _getFreshBoxxerFighters();
     const boxxerTweets = await _getFighterTweets(freshBoxxerFighters, 'boxxer', 'BOXXER');
     
+    // Top Rank
+    const freshTopRankFighters = await _getFreshTopRankFighters();
+    const topRankTweets = await _getFighterTweets(freshTopRankFighters, 'top-rank', 'Top Rank');
+
     await _tweetIncrementally([
       ...matchroomTweets,
       ...frankWarrenTweets,
       ...probellumTweets,
       ...pbcTweets,
       ...boxxerTweets,
+      ...topRankTweets,
     ]);
   } catch (error) {
     console.error(error);
