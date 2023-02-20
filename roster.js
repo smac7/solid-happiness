@@ -195,10 +195,6 @@ const _getFighterTweets = async (
     Parse.initialize(process.env.REMOTE_APPLICATION_ID, process.env.REMOTE_KEY); 
     Parse.serverURL = process.env.REMOTE_URL;
 
-    // Matchroom
-    const freshMatchroomFighters = await _getFreshMatchroomFighters();
-    const matchroomTweets = await _getFighterTweets(freshMatchroomFighters, 'matchroom', 'Matchroom Boxing');
-
     // Frank Warren
     const freshFrankWarrenFighters = await _getFreshFrankWarrenFighters();
     const frankWarrenTweets = await _getFighterTweets(freshFrankWarrenFighters, 'frank-warren', 'Frank Warren and Queensberry Promotions');
@@ -220,7 +216,6 @@ const _getFighterTweets = async (
     const topRankTweets = await _getFighterTweets(freshTopRankFighters, 'top-rank', 'Top Rank');
 
     await _tweetIncrementally([
-      ...matchroomTweets,
       ...frankWarrenTweets,
       ...probellumTweets,
       ...pbcTweets,
